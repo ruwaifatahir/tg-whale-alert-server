@@ -7,7 +7,6 @@ export const INSIDEX_API_URL = process.env.INSIDEX_API_URL;
 export const INSIDEX_API_KEY = process.env.INSIDEX_API_KEY;
 
 export const STABLE_COINS = process.env.STABLE_COINS.split(",");
-export const COINS_TO_IGNORE = process.env.COINS_TO_IGNORE.split(",");
 
 export const LOOK_BACK_PERIOD_MS = process.env.LOOK_BACK_PERIOD_MS;
 

@@ -1,4 +1,4 @@
-import { COINS_TO_IGNORE, STABLE_COINS } from "./constants.js";
+import { STABLE_COINS } from "./constants.js";
 
 export const sleep = (time) => {
   return new Promise((resolve) => setTimeout(resolve, time));
@@ -7,9 +7,7 @@ export const sleep = (time) => {
 export const getFilteredBalances = (balances, coinType) => {
   return balances.filter(
     (balance) =>
-      !STABLE_COINS.includes(balance.coinType) &&
-      !COINS_TO_IGNORE.includes(balance.coinType) &&
-      balance.coinType !== coinType
+      !STABLE_COINS.includes(balance.coinType) && balance.coinType !== coinType
   );
 };
 
