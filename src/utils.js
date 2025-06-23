@@ -71,7 +71,7 @@ export const generateEmojis = (amount) => {
       ? parseFloat(amount.replace(/[$,]/g, ""))
       : amount;
   const emojiCount = Math.floor(dollarAmount / 10);
-  return "🟢".repeat(Math.min(emojiCount, 50));
+  return "🐋".repeat(Math.min(emojiCount, 50));
 };
 
 export const formatTokenAmount = (amount, decimals = 6) => {
