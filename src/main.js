@@ -19,14 +19,13 @@ import {
   formatWalletStats,
   getFilteredBalances,
   getTopBalance,
-  sleep,
   createAddressLink,
   createTxLink,
   generateEmojis,
   formatTokenAmount,
 } from "./utils.js";
 
-import { LOOK_BACK_PERIOD_MS } from "./constants.js";
+import { LOOK_BACK_PERIOD_MS, MIN_WHALE_BALANCE } from "./constants.js";
 
 export default async function () {
   const groups = await getGroups();
@@ -48,8 +47,8 @@ export default async function () {
       endTime
     );
 
-    // trades = trades.filter((trade) => trade.volume > group.min_buy);
-    trades = trades.filter((trade) => trade.volume > 100);
+    trades = trades.filter((trade) => trade.volume > group.min_buy);
+    // trades = trades.filter((trade) => trade.volume > 100);
 
     console.log(`${trades.length} trades found for ${group.group_id}`);
 
@@ -73,8 +72,12 @@ export default async function () {
 
       const topBalance = getTopBalance(filteredBalances);
 
+      if (topBalance.value < MIN_WHALE_BALANCE) continue;
+
       const coinTicker = extractTicker(group.token_address);
+
       const receivedTokenTicker = extractTicker(trade.coinOut);
+
       const tokenAmountReceived = formatTokenAmount(trade.amountOut);
 
       const whaleTicker = topBalance.coinMetadata.symbol;
@@ -85,8 +88,7 @@ export default async function () {
 
       const fdv = formatUsd(Number(marketData.marketCap).toFixed(2));
 
-      const { winRate, totalTrades, avgTrade, volume } =
-        formatWalletStats(stats);
+      const { winRate, avgTrade, volume } = formatWalletStats(stats);
 
       const socialLinks = formatSocialLinks(
         group.website,
@@ -96,7 +98,7 @@ export default async function () {
 
       const addressLink = createAddressLink(trade.user);
       const txLink = createTxLink(trade.digest);
-      const emojis = generateEmojis(Number(trade.volume));
+      const emojis = generateEmojis(Number(trade.volume), group.emoji);
 
       const message = formatMessage(
         whaleTicker,

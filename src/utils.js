@@ -65,13 +65,13 @@ export const createTxLink = (txHash) => {
   return `[Tx](https://suivision.xyz/txblock/${txHash})`;
 };
 
-export const generateEmojis = (amount) => {
+export const generateEmojis = (amount, emoji = "🐋") => {
   const dollarAmount =
     typeof amount === "string"
       ? parseFloat(amount.replace(/[$,]/g, ""))
       : amount;
   const emojiCount = Math.floor(dollarAmount / 10);
-  return "🐋".repeat(Math.min(emojiCount, 50));
+  return emoji.repeat(Math.min(emojiCount, 50));
 };
 
 export const formatTokenAmount = (amount, decimals = 6) => {
@@ -100,7 +100,7 @@ export const formatMessage = (
   receivedTokenTicker,
   socialLinks = ""
 ) => {
-  const formattedMessage = `$${whaleTicker} whale bought ${coinTicker}  
+  const formattedMessage = `$${whaleTicker} whale bought $${coinTicker}\n
 ${emojis}
 
 📊 Size ${amountBought} (${fdv} FDV)

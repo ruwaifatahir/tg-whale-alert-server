@@ -10,3 +10,5 @@ export const STABLE_COINS = process.env.STABLE_COINS.split(",");
 export const COINS_TO_IGNORE = process.env.COINS_TO_IGNORE.split(",");
 
 export const LOOK_BACK_PERIOD_MS = process.env.LOOK_BACK_PERIOD_MS;
+
+export const MIN_WHALE_BALANCE = process.env.MIN_WHALE_BALANCE || 5000;

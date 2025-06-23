@@ -69,7 +69,7 @@ export const getMarketDataOfCoin = async (coin) => {
 export const getGroups = async () => {
   const { data } = await supabase
     .from("bot_groups")
-    .select("*, media_url, website, telegram, x_link")
+    .select("*, media_url, website, telegram, x_link, emoji")
     .eq("is_on", true)
     .not("token_address", "is", null);
 
