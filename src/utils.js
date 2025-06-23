@@ -52,28 +52,68 @@ export const formatSocialLinks = (website, telegram, xLink) => {
   return links.length > 0 ? `\n\n🔗 ${links.join(" | ")}` : "";
 };
 
+export const truncateAddress = (address) => {
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
+};
+
+export const createAddressLink = (address) => {
+  const truncated = truncateAddress(address);
+  return `[${truncated}](https://suivision.xyz/account/${address})`;
+};
+
+export const createTxLink = (txHash) => {
+  return `[Tx](https://suivision.xyz/txblock/${txHash})`;
+};
+
+export const generateEmojis = (amount) => {
+  const dollarAmount =
+    typeof amount === "string"
+      ? parseFloat(amount.replace(/[$,]/g, ""))
+      : amount;
+  const emojiCount = Math.floor(dollarAmount / 10);
+  return "🟢".repeat(Math.min(emojiCount, 50));
+};
+
+export const formatTokenAmount = (amount, decimals = 6) => {
+  const formattedAmount = (amount / Math.pow(10, decimals)).toLocaleString(
+    "en-US",
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  );
+  return formattedAmount;
+};
+
 export const formatMessage = (
   whaleTicker,
   amountBought,
   coinTicker,
   fdv,
   winRate,
-  totalTrades,
-  pnlStatus,
   avgTrade,
   volume,
+  addressLink,
+  txLink,
+  emojis,
+  tokenAmountReceived,
+  receivedTokenTicker,
   socialLinks = ""
 ) => {
-  const formattedMessage = `🐳 $${whaleTicker} whale bought ${amountBought} of $${coinTicker} at ${fdv} FDV
+  const formattedMessage = `$${whaleTicker} whale bought ${coinTicker}  
+${emojis}
+
+📊 Size ${amountBought} (${fdv} FDV)
+🏛️ Got ${tokenAmountReceived} of $${receivedTokenTicker} 
+👤 Buyer ${addressLink} | ${txLink}
+📈 MC ${fdv}
 
 ═══════════════════════
 
 🎯 Whale Analytics:
-▸ Win Rate: ${winRate}%
-▸ Total Trades: ${totalTrades}
-▸ P&L: ${pnlStatus}
-▸ Avg Trade Size: ${avgTrade}
-▸ Total Volume: ${volume}
+• Win Rate: ${winRate}%
+• Avg Trade Size: ${avgTrade}
+• Total Volume: ${volume}
 
 🤖 Powered by Neonet AI${socialLinks}`;
   return formattedMessage;

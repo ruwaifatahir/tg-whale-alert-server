@@ -1,4 +1,4 @@
-Please review my entire project to get the graspt of my codebase. 
+Please review my entire project to get the grasp of my codebase. 
 
 We are just discussing for now, don't change any file yet.
 
