@@ -14,6 +14,7 @@ import {
 import {
   extractTicker,
   formatMessage,
+  formatSocialLinks,
   formatUsd,
   formatWalletStats,
   getFilteredBalances,
@@ -43,8 +44,7 @@ export default async function () {
       endTime
     );
 
-    // trades = trades.filter((trade) => trade.volume > group.min_buy);
-    trades = trades.filter((trade) => trade.volume > 100);
+    trades = trades.filter((trade) => trade.volume > group.min_buy);
 
     console.log(`${trades.length} trades found for ${group.group_id}`);
 
@@ -81,6 +81,12 @@ export default async function () {
       const { winRate, totalTrades, pnlStatus, avgTrade, volume } =
         formatWalletStats(stats);
 
+      const socialLinks = formatSocialLinks(
+        group.website,
+        group.telegram,
+        group.x_link
+      );
+
       const message = formatMessage(
         whaleTicker,
         amountBought,
@@ -90,7 +96,8 @@ export default async function () {
         totalTrades,
         pnlStatus,
         avgTrade,
-        volume
+        volume,
+        socialLinks
       );
 
       await sendWhaleAlert(group.group_id, message, group.media_url);
@@ -102,8 +109,6 @@ export default async function () {
         group.token_address,
         trade.volume
       );
-
-      await sleep(1000);
     }
   }
 }

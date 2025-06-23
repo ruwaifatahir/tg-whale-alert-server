@@ -42,6 +42,16 @@ export const formatWalletStats = (stats) => {
   return { winRate, totalTrades, pnlStatus, volume, avgTrade };
 };
 
+export const formatSocialLinks = (website, telegram, xLink) => {
+  const links = [];
+
+  if (website) links.push(`[Website](${website})`);
+  if (telegram) links.push(`[Telegram](${telegram})`);
+  if (xLink) links.push(`[Twitter](${xLink})`);
+
+  return links.length > 0 ? `\n\n🔗 ${links.join(" | ")}` : "";
+};
+
 export const formatMessage = (
   whaleTicker,
   amountBought,
@@ -51,7 +61,8 @@ export const formatMessage = (
   totalTrades,
   pnlStatus,
   avgTrade,
-  volume
+  volume,
+  socialLinks = ""
 ) => {
   const formattedMessage = `🐳 $${whaleTicker} whale bought ${amountBought} of $${coinTicker} at ${fdv} FDV
 
@@ -64,6 +75,6 @@ export const formatMessage = (
 ▸ Avg Trade Size: ${avgTrade}
 ▸ Total Volume: ${volume}
 
-🤖 Powered by Neonet AI`;
+🤖 Powered by Neonet AI${socialLinks}`;
   return formattedMessage;
 };
