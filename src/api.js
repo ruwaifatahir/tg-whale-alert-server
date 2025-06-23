@@ -2,7 +2,11 @@ import axios from "axios";
 
 import { Telegraf, Input } from "telegraf";
 import { createClient } from "@supabase/supabase-js";
-import { INSIDEX_API_URL, INSIDEX_API_KEY } from "./constants.js";
+import {
+  INSIDEX_API_URL,
+  INSIDEX_API_KEY,
+  TRENDING_CHANNEL_ID,
+} from "./constants.js";
 
 const bot = new Telegraf(
   process.env.BOT_TOKEN || "7207651173:AAGibr8rxsNi6EmkOB1-Nj6GYnp9krFvOkA"
@@ -104,50 +108,57 @@ export const saveWhaleAlert = async (
 };
 
 export const sendWhaleAlert = async (groupId, message, mediaUrl = null) => {
-  try {
-    if (mediaUrl && mediaUrl.startsWith("http")) {
-      try {
-        if (mediaUrl.includes(".gif")) {
-          await bot.telegram.sendAnimation(
-            groupId,
-            Input.fromURLStream(mediaUrl, "media.gif"),
-            {
-              caption: message,
-              parse_mode: "Markdown",
-            }
-          );
-        } else if (mediaUrl.includes(".mp4") || mediaUrl.includes(".mov")) {
-          await bot.telegram.sendVideo(
-            groupId,
-            Input.fromURLStream(mediaUrl, "media.mp4"),
-            {
-              caption: message,
-              parse_mode: "Markdown",
-            }
-          );
-        } else {
-          await bot.telegram.sendPhoto(
-            groupId,
-            Input.fromURLStream(mediaUrl, "media.jpg"),
-            {
-              caption: message,
-              parse_mode: "Markdown",
-            }
-          );
+  const sendToChannel = async (channelId) => {
+    try {
+      if (mediaUrl && mediaUrl.startsWith("http")) {
+        try {
+          if (mediaUrl.includes(".gif")) {
+            await bot.telegram.sendAnimation(
+              channelId,
+              Input.fromURLStream(mediaUrl, "media.gif"),
+              {
+                caption: message,
+                parse_mode: "Markdown",
+              }
+            );
+          } else if (mediaUrl.includes(".mp4") || mediaUrl.includes(".mov")) {
+            await bot.telegram.sendVideo(
+              channelId,
+              Input.fromURLStream(mediaUrl, "media.mp4"),
+              {
+                caption: message,
+                parse_mode: "Markdown",
+              }
+            );
+          } else {
+            await bot.telegram.sendPhoto(
+              channelId,
+              Input.fromURLStream(mediaUrl, "media.jpg"),
+              {
+                caption: message,
+                parse_mode: "Markdown",
+              }
+            );
+          }
+        } catch (mediaError) {
+          await bot.telegram.sendMessage(channelId, message, {
+            parse_mode: "Markdown",
+            disable_web_page_preview: true,
+          });
         }
-      } catch (mediaError) {
-        await bot.telegram.sendMessage(groupId, message, {
+      } else {
+        await bot.telegram.sendMessage(channelId, message, {
           parse_mode: "Markdown",
           disable_web_page_preview: true,
         });
       }
-    } else {
-      await bot.telegram.sendMessage(groupId, message, {
-        parse_mode: "Markdown",
-        disable_web_page_preview: true,
-      });
+    } catch (error) {
+      console.error(`Failed to send message to ${channelId}:`, error);
     }
-  } catch (error) {
-    console.error(`Failed to send message to group ${groupId}:`, error);
-  }
+  };
+
+  await Promise.all([
+    sendToChannel(groupId),
+    sendToChannel(TRENDING_CHANNEL_ID),
+  ]);
 };
