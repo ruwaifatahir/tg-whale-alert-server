@@ -96,19 +96,21 @@ export const formatMessage = (
   emojis,
   tokenAmountReceived,
   receivedTokenTicker,
-  socialLinks = ""
+  socialLinks = "",
+  topBalanceValue
 ) => {
-  const formattedMessage = `$${whaleTicker} whale bought $${coinTicker}\n
+  const formattedMessage = `$${whaleTicker} whale bought $${coinTicker.toUpperCase()}\n
 ${emojis}
 
-📊 Size ${amountBought} (${fdv} FDV)
-🏛️ Got ${tokenAmountReceived} of $${receivedTokenTicker} 
+📊 Size ${amountBought}
+🏛️ Got ${tokenAmountReceived} ${receivedTokenTicker} 
 👤 Buyer ${addressLink} | ${txLink}
 📈 MC ${fdv}
 
 ═══════════════════════
 
 🎯 Whale Analytics:
+• $${whaleTicker} holdings: ${formatUsd(Number(topBalanceValue).toFixed(2))}
 • Win Rate: ${winRate}%
 • Avg Trade Size: ${avgTrade}
 • Total Volume: ${volume}

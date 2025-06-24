@@ -108,57 +108,100 @@ export const saveWhaleAlert = async (
 };
 
 export const sendWhaleAlert = async (groupId, message, mediaUrl = null) => {
-  const sendToChannel = async (channelId) => {
-    try {
-      if (mediaUrl && mediaUrl.startsWith("http")) {
-        try {
-          if (mediaUrl.includes(".gif")) {
-            await bot.telegram.sendAnimation(
-              channelId,
-              Input.fromURLStream(mediaUrl, "media.gif"),
-              {
-                caption: message,
-                parse_mode: "Markdown",
-              }
-            );
-          } else if (mediaUrl.includes(".mp4") || mediaUrl.includes(".mov")) {
-            await bot.telegram.sendVideo(
-              channelId,
-              Input.fromURLStream(mediaUrl, "media.mp4"),
-              {
-                caption: message,
-                parse_mode: "Markdown",
-              }
-            );
-          } else {
-            await bot.telegram.sendPhoto(
-              channelId,
-              Input.fromURLStream(mediaUrl, "media.jpg"),
-              {
-                caption: message,
-                parse_mode: "Markdown",
-              }
-            );
-          }
-        } catch (mediaError) {
-          await bot.telegram.sendMessage(channelId, message, {
-            parse_mode: "Markdown",
-            disable_web_page_preview: true,
-          });
+  try {
+    if (mediaUrl && mediaUrl.startsWith("http")) {
+      try {
+        if (mediaUrl.includes(".gif")) {
+          await bot.telegram.sendAnimation(
+            groupId,
+            Input.fromURLStream(mediaUrl, "media.gif"),
+            {
+              caption: message,
+              parse_mode: "Markdown",
+            }
+          );
+        } else if (mediaUrl.includes(".mp4") || mediaUrl.includes(".mov")) {
+          await bot.telegram.sendVideo(
+            groupId,
+            Input.fromURLStream(mediaUrl, "media.mp4"),
+            {
+              caption: message,
+              parse_mode: "Markdown",
+            }
+          );
+        } else {
+          await bot.telegram.sendPhoto(
+            groupId,
+            Input.fromURLStream(mediaUrl, "media.jpg"),
+            {
+              caption: message,
+              parse_mode: "Markdown",
+            }
+          );
         }
-      } else {
-        await bot.telegram.sendMessage(channelId, message, {
+      } catch (mediaError) {
+        await bot.telegram.sendMessage(groupId, message, {
           parse_mode: "Markdown",
           disable_web_page_preview: true,
         });
       }
-    } catch (error) {
-      console.error(`Failed to send message to ${channelId}:`, error);
+    } else {
+      await bot.telegram.sendMessage(groupId, message, {
+        parse_mode: "Markdown",
+        disable_web_page_preview: true,
+      });
     }
-  };
+  } catch (error) {
+    console.error(`Failed to send message to ${groupId}:`, error);
+  }
+};
 
-  await Promise.all([
-    sendToChannel(groupId),
-    sendToChannel(TRENDING_CHANNEL_ID),
-  ]);
+export const sendChannelAlert = async (message) => {
+  try {
+    await bot.telegram.sendMessage(TRENDING_CHANNEL_ID, message, {
+      parse_mode: "Markdown",
+      disable_web_page_preview: true,
+    });
+  } catch (error) {
+    console.error(`Failed to send message to ${TRENDING_CHANNEL_ID}:`, error);
+  }
+};
+
+export const getTrendingOrders = async () => {
+  const { data } = await supabase
+    .from("trending_orders")
+    .select("*")
+    .eq("payment_status", "confirmed")
+    .gte("trending_end_time", new Date().toISOString())
+    .order("slot_type", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  return data;
+};
+
+export const checkTrendingAlertExists = async (trendingOrderId, digest) => {
+  const { data } = await supabase
+    .from("trending_alerts")
+    .select("id")
+    .eq("trending_order_id", trendingOrderId)
+    .eq("digest", digest)
+    .single();
+
+  return !!data;
+};
+
+export const saveTrendingAlert = async (
+  trendingOrderId,
+  digest,
+  whaleAddress,
+  tokenAddress,
+  tradeVolume
+) => {
+  await supabase.from("trending_alerts").insert({
+    trending_order_id: trendingOrderId,
+    digest,
+    whale_address: whaleAddress,
+    token_address: tokenAddress,
+    trade_volume: tradeVolume,
+  });
 };
